@@ -1,6 +1,7 @@
-package example;
+package example
 
 import example.Main.Bedrag
+
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
