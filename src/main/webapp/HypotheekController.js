@@ -2,7 +2,11 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
     var self = this;
     self.model = {
         hypotheeksom: 260000,
-        wozwaarde: 255000
+        wozwaarde: 255000,
+        rente: 2.9,
+        looptijdMaanden: 360,
+        belastingSchijf: 42,
+        startDate: new Date()
     };
     var ctx = document.getElementById("chart").getContext("2d");
     var chart = undefined;
@@ -26,16 +30,9 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
             var labels = [];
             var brutoData = [];
             var nettoData = [];
-            var year = 2016;
             for (var i = 0; i < data.length; i++) {
                 var obj = data[i];
-                if (i%12 == 0) {
-                    labels.push(year);
-                    year++;
-                }
-                else {
-                    labels.push('');
-                }
+                labels.push(obj.year);
                 brutoData.push(obj.bruto);
                 nettoData.push(obj.netto);
             }
@@ -68,6 +65,22 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
             chart = new Chart(ctx).Line(chartData);
         });
     };
+
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.global.scaleShowVerticalLines = false;
+    Chart.defaults.global.animation = false;
+    Chart.defaults.global.animationSteps = 10;
+    // String - Animation easing effect
+    // Possible effects are:
+    // [easeInOutQuart, linear, easeOutBounce, easeInBack, easeInOutQuad,
+    //  easeOutQuart, easeOutQuad, easeInOutBounce, easeOutSine, easeInOutCubic,
+    //  easeInExpo, easeInOutBack, easeInCirc, easeInOutElastic, easeOutBack,
+    //  easeInQuad, easeInOutExpo, easeInQuart, easeOutQuint, easeInOutCirc,
+    //  easeInSine, easeOutExpo, easeOutCirc, easeOutCubic, easeInQuint,
+    //  easeInElastic, easeInOutSine, easeInOutQuint, easeInBounce,
+    //  easeOutElastic, easeInCubic]
+    Chart.defaults.global.animationEasing = "linear";
 
     self.initialize();
 }]);

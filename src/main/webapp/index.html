@@ -6,30 +6,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
     <script src="angular.js"></script>
     <script src="HypotheekController.js"></script>
-    <script type="application/javascript">
-        Chart.defaults.global.responsive = true;
-        Chart.defaults.global.maintainAspectRatio = false;
-        Chart.defaults.global.scaleShowVerticalLines = false;
-        Chart.defaults.global.animation = false;
-        Chart.defaults.global.animationSteps = 10;
-            // String - Animation easing effect
-            // Possible effects are:
-            // [easeInOutQuart, linear, easeOutBounce, easeInBack, easeInOutQuad,
-            //  easeOutQuart, easeOutQuad, easeInOutBounce, easeOutSine, easeInOutCubic,
-            //  easeInExpo, easeInOutBack, easeInCirc, easeInOutElastic, easeOutBack,
-            //  easeInQuad, easeInOutExpo, easeInQuart, easeOutQuint, easeInOutCirc,
-            //  easeInSine, easeOutExpo, easeOutCirc, easeOutCubic, easeInQuint,
-            //  easeInElastic, easeInOutSine, easeInOutQuint, easeInBounce,
-            //  easeOutElastic, easeInCubic]
-        Chart.defaults.global.animationEasing = "linear";
-    </script>
 </head>
 <body data-ng-controller="HypotheekController as ctrl">
     <span>Hypotheek terugbetaal maandbedrag</span><br/>
     <div>
         <button data-ng-click="ctrl.redraw()">Ververs</button>
-        <label>Hypotheeksom</label><input type="number" data-ng-model="ctrl.model.hypotheeksom" />
-        <label>WOZ waarde</label><input type="number" data-ng-model="ctrl.model.wozwaarde" />
+        <label>Hypotheeksom <input type="number" data-ng-model="ctrl.model.hypotheeksom" /></label>
+        <label>WOZ waarde <input type="number" data-ng-model="ctrl.model.wozwaarde" /></label>
+        <label>rente <input type="text" data-ng-model="ctrl.model.rente" /></label>
+        <label>looptijd in maanden <input type="number" data-ng-model="ctrl.model.looptijdMaanden" min="1" max="360"/></label>
+        <label>belastingschijf <input type="text" data-ng-model="ctrl.model.belastingSchijf" /></label>
+        <label>start van de Hypotheek <input type="date" data-ng-model="ctrl.model.startDate" /></label>
     </div>
     <canvas id="chart" width="80%" height="600px"></canvas>
 </body>

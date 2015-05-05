@@ -5,8 +5,9 @@ import example.Main.Bedrag
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
-class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, looptijdMaanden: Int, forfait: Double, belastingSchaal: Double) {
-    val forfaitPerMaand = (wozWaarde * forfait) / 12
+class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, looptijdMaanden: Int, forfait: Double,
+                belastingSchaal: Double, startMonth : Int, startYear : Int) {
+    val forfaitBedrag = wozWaarde * forfait
     val maandRente : Bedrag = {
       Math.pow(1.0 + jaarRente, 1.0 / 12.0) - 1.0
     }
@@ -15,43 +16,62 @@ class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, loopt
       hoofdSom * (maandRente / (1.0 - Math.pow(1.0 + maandRente, -looptijdMaanden)))
     }
 
-    def renteAflos() : Seq[(Bedrag, Bedrag)] = {
-      def renteAflosSub ( bedrag: Bedrag, acc: Seq[(Bedrag, Bedrag)]): Seq[(Bedrag, Bedrag)] = {
+    def renteAflos() : Seq[MaandLasten] = {
+      def renteAflosSub (month : Int, year : Int, bedrag: Bedrag, acc: Seq[MaandLasten]): Seq[MaandLasten] = {
         if ( bedrag <= 0.01 ) {
           acc
         } else {
           val renteBedrag = maandRente * bedrag
           val aflosBedrag: Bedrag = brutoMaandBedrag - renteBedrag
-          renteAflosSub(bedrag - aflosBedrag, acc :+ (renteBedrag, aflosBedrag))
+          val maandLasten: MaandLasten = new MaandLasten(month, year, renteBedrag, aflosBedrag)
+          val newDate = calcNewDate(month, year)
+          renteAflosSub(newDate._1, newDate._2, bedrag - aflosBedrag, acc :+ maandLasten)
         }
       }
-      renteAflosSub(hoofdSom, List())
+      renteAflosSub(startMonth, startYear, hoofdSom, List())
     }
 
-    def nettoList(brutoList : Seq[(Bedrag, Bedrag)]) : Seq[Lasten] = {
-      brutoList.map(t => new Lasten(round(t._1 + t._2), round(netto(t._1, t._2))))
+    def calcNewDate(month : Int, year : Int): (Int, Int) = {
+      if (month == 12) (1, year + 1) else (month + 1, year)
     }
 
-    def netto(brutoRente : Bedrag, aflosBedrag: Bedrag) : Bedrag = {
-      val belastingVoordeel: Bedrag = brutoRente * belastingSchaal - forfaitPerMaand
-      if (belastingVoordeel > 0) {
-        aflosBedrag + (brutoRente - belastingVoordeel)
-      }
-      else {
-        aflosBedrag + brutoRente
-      }
+    def nettoList(brutoList : Seq[MaandLasten]) : Seq[Lasten] = {
+      val values: Map[Int, JaarLasten] = brutoList.groupBy(_.year).mapValues(seq => seq.foldLeft(new JaarLasten(0,0,0))((jaarLast, maand) => jaarLast.addMaand(maand)))
+      values.toList.map(tuple => new Lasten(tuple._1, tuple._2.brutoBedrag(), tuple._2.nettoBedrag())).sortBy(_.year)
     }
 
-    def round (bedrag : Bedrag) : Bedrag = {
-      BigDecimal(bedrag).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-    }
 
     def calculateLasten() : java.util.List[Lasten] = {
-      nettoList(renteAflos()).asJava
+      val aflos: Seq[MaandLasten] = renteAflos()
+      for (a <- aflos) println(a.month + " " + a.year + " - " + a.rente + " - " + a.aflos)
+      nettoList(aflos).asJava
+    }
+
+    class MaandLasten(val month : Int, val year : Int, val rente : Bedrag, val aflos : Bedrag)
+
+    class JaarLasten(nrMonths : Int, totalRente : Bedrag, totalAflos : Bedrag) {
+
+      def addMaand(maandLast : MaandLasten) = {
+        new JaarLasten(nrMonths + 1, totalRente + maandLast.rente, totalAflos + maandLast.aflos)
+      }
+
+      def brutoBedrag() : Bedrag = round((totalAflos + totalRente) / nrMonths)
+      def nettoBedrag() : Bedrag = round((totalAflos + (totalRente - terugvanBelasting)) / nrMonths)
+
+      private def terugvanBelasting: Bedrag = {
+        val b: Bedrag = (totalRente - calcForfaitBedrag()) * belastingSchaal
+        if (b > 0.0) b else 0
+      }
+
+      private def calcForfaitBedrag(): Bedrag = if (nrMonths == 12) forfaitBedrag else forfaitBedrag * (nrMonths / 12.0)
+
+      def round (bedrag : Bedrag) : Bedrag = {
+        BigDecimal(bedrag).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+      }
     }
 }
 
-class Lasten(@BeanProperty var bruto : Bedrag,
-             @BeanProperty var netto : Bedrag) {
 
-}
+class Lasten(@BeanProperty var year : Int,
+             @BeanProperty var bruto : Bedrag,
+             @BeanProperty var netto : Bedrag)
