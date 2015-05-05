@@ -1,13 +1,9 @@
-package example
+package nl.linuse.hypotheek
 
-import example.Main.Bedrag
+import Main.Bedrag
 
-import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
-
-class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, looptijdMaanden: Int, forfait: Double,
+class Annuiteit(hoofdSom : Bedrag, jaarRente : Double, looptijdMaanden: Int, forfaitBedrag: Double,
                 belastingSchaal: Double, startMonth : Int, startYear : Int) {
-    val forfaitBedrag = wozWaarde * forfait
     val maandRente : Bedrag = {
       Math.pow(1.0 + jaarRente, 1.0 / 12.0) - 1.0
     }
@@ -41,10 +37,8 @@ class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, loopt
     }
 
 
-    def calculateLasten() : java.util.List[Lasten] = {
-      val aflos: Seq[MaandLasten] = renteAflos()
-      for (a <- aflos) println(a.month + " " + a.year + " - " + a.rente + " - " + a.aflos)
-      nettoList(aflos).asJava
+    def calculateLasten() : Seq[Lasten] = {
+      nettoList(renteAflos())
     }
 
     class MaandLasten(val month : Int, val year : Int, val rente : Bedrag, val aflos : Bedrag)
@@ -70,8 +64,3 @@ class Annuiteit(hoofdSom : Bedrag, wozWaarde : Bedrag, jaarRente : Double, loopt
       }
     }
 }
-
-
-class Lasten(@BeanProperty var year : Int,
-             @BeanProperty var bruto : Bedrag,
-             @BeanProperty var netto : Bedrag)

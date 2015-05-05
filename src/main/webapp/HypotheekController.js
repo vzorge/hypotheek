@@ -1,15 +1,31 @@
 angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '$location', function($http, $location) {
     var self = this;
     self.model = {
-        hypotheeksom: 260000,
-        wozwaarde: 255000,
-        rente: 2.9,
-        looptijdMaanden: 360,
+        wozWaarde: 255000,
         belastingSchijf: 42,
-        startDate: new Date()
+        startDate: new Date(),
+        hypotheken : [
+            {
+                hypotheekSom: 260000,
+                rente: 2.9,
+                looptijdMaanden: 360
+            }
+        ]
     };
     var ctx = document.getElementById("chart").getContext("2d");
     var chart = undefined;
+
+    self.toevoegen = function() {
+        self.model.hypotheken.push({
+            hypotheekSom: 0,
+            rente: 2.9,
+            looptijdMaanden: 360
+        })
+    };
+
+    self.verwijderen = function(index) {
+        self.model.hypotheken.splice(index, 1)
+    };
 
     self.initialize = function() {
         self.redraw();
@@ -21,10 +37,7 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
             chart = undefined;
         }
         var url = $location.absUrl() + 'api/lasten';
-        var options = {
-            params: self.model
-        };
-        $http.get(url, options).then(function(response) {
+        $http.post(url, angular.toJson(self.model)).then(function(response) {
             var data = response.data;
 
             var labels = [];
@@ -66,7 +79,7 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
         });
     };
 
-    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.responsive = false;
     Chart.defaults.global.maintainAspectRatio = false;
     Chart.defaults.global.scaleShowVerticalLines = false;
     Chart.defaults.global.animation = false;
