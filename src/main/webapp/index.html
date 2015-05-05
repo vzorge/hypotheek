@@ -14,72 +14,103 @@
 </head>
 <body data-ng-controller="HypotheekController as ctrl" style="margin: 10px;">
 <h2>Overzicht van bruto en netto maandbedrag voor een hypotheek</h2>
-<div>
-    <p>
-        <button class="btn btn-primary" data-ng-click="ctrl.redraw()">Ververs</button>
-        <button class="btn btn-success" data-ng-click="ctrl.toevoegen()">Leningdeel toevoegen</button>
-    </p>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="wozWaarde">WOZ waarde</label>
-                <div class="input-group">
-                    <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                    <input id="wozWaarde" type="number" data-ng-model="ctrl.model.wozWaarde" class="form-control" />
+<div class="container-fluid">
+    <form data-ng-submit="ctrl.redraw()">
+    <div>
+        <div class="row">
+            <div class="col-md-3">
+                <p>
+                    <button type=submit class="btn btn-primary btn-lg">Ververs</button>
+                    <button class="btn btn-success btn-lg" data-ng-click="ctrl.toevoegen()">Leningdeel toevoegen</button>
+                </p>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="wozWaarde">WOZ waarde</label>
+                    <div class="input-group">
+                        <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
+                        <input id="wozWaarde" type="number" data-ng-model="ctrl.model.wozWaarde" class="form-control" step="1000"/>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="belastingSchijf">Hypotheekrente aftrek</label>
-                <div class="input-group">
-                    <input id="belastingSchijf" type="number" data-ng-model="ctrl.model.belastingSchijf" class="form-control input-size"/>
-                    <span class="input-group-addon">%</span>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="belastingSchijf">Hypotheekrente aftrek percentage</label>
+                    <select id="belastingSchijf" class="form-control" data-ng-model="ctrl.model.belastingSchijf">
+                        <option value="36.25">36,25%</option>
+                        <option value="42">42%</option>
+                        <option value="51">51%</option>
+                    </select>
                 </div>
             </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="startDate">Start van de hypotheek</label>
+                    <input id="startDate" type="date" data-ng-model="ctrl.model.startDate" class="form-control input-size" size="40"/>
+                </div>
+            </div>
+            <div class="col-md-3"></div>
         </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="startDate">Start van de hypotheek</label>
-                <input id="startDate" type="date" data-ng-model="ctrl.model.startDate" class="form-control input-size" size="40"/>
+        <div class="row">
+            <div class="col-md-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
+                <div class="leningdeel">
+                    <div class="form-group">
+                        <label for="aflosvorm-{{$index}}">Soort hypotheek / Aflosvorm</label>
+                        <select id="aflosvorm-{{$index}}" class="form-control" data-ng-model="hypotheek.aflosvorm">
+                            <option>Annuiteit</option>
+                            <option>Lineair</option>
+                            <option>Aflossingsvrij</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hypotheekSom-{{$index}}">Hypotheeksom</label>
+                        <div class="input-group">
+                            <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
+                            <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size" step="1000"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rente-{{$index}}">Rente</label>
+                        <div class="input-group">
+                            <input id="rente-{{$index}}" type="number" data-ng-model="hypotheek.rente" class="form-control input-size" step="0.1"/>
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="looptijdMaanden-{{$index}}">Looptijd in maanden</label>
+                        <input id="looptijdMaanden-{{$index}}" type="number" data-ng-model="hypotheek.looptijdMaanden" min="1" max="360" class="form-control input-size"/>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-danger btn-xs" data-ng-click="ctrl.verwijderen($index)">Leningdeel verwijderen</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    </form>
     <div class="row">
-        <div class="col-md-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
-            <div class="leningdeel">
-                <div class="form-group">
-                    <label for="aflosvorm-{{$index}}">Soort hypotheek / Aflosvorm</label>
-                    <select id="aflosvorm-{{$index}}" class="form-control" data-ng-model="hypotheek.aflosvorm">
-                        <option>Annuiteit</option>
-                        <option>Lineair</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="hypotheekSom-{{$index}}">Hypotheeksom</label>
-                    <div class="input-group">
-                        <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                        <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size" step="1000"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="rente-{{$index}}">Rente</label>
-                    <div class="input-group">
-                        <input id="rente-{{$index}}" type="number" data-ng-model="hypotheek.rente" class="form-control input-size" step="0.1"/>
-                        <span class="input-group-addon">%</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="looptijdMaanden-{{$index}}">Looptijd in maanden</label>
-                    <input id="looptijdMaanden-{{$index}}" type="number" data-ng-model="hypotheek.looptijdMaanden" min="1" max="360" class="form-control input-size"/>
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-danger" data-ng-click="ctrl.verwijderen($index)">Leningdeel verwijderen</button>
-                </div>
-            </div>
+        <div class="col-lg-9">
+            <canvas id="chart" class="lasten-chart"></canvas>
+        </div>
+        <div class="col-lg-3">
+            <table class="table table-hover table-condensed table-responsive">
+                <thead>
+                    <tr>
+                        <th>Jaar</th>
+                        <th>Bruto</th>
+                        <th>Netto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="row in ctrl.data">
+                        <td>{{row.year}}</td>
+                        <td>&euro; {{row.bruto}}</td>
+                        <td>&euro; {{row.netto}}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-<canvas id="chart" width="700" height="600px"></canvas>
 </body>
 </html>

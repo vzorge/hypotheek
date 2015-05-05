@@ -37,16 +37,17 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
         if (chart) {
             chart.destroy();
             chart = undefined;
+            self.data = undefined;
         }
         var url = $location.absUrl() + 'api/lasten';
         $http.post(url, angular.toJson(self.model)).then(function(response) {
-            var data = response.data;
+            self.data = response.data;
 
             var labels = [];
             var brutoData = [];
             var nettoData = [];
-            for (var i = 0; i < data.length; i++) {
-                var obj = data[i];
+            for (var i = 0; i < self.data.length; i++) {
+                var obj = self.data[i];
                 labels.push(obj.year);
                 brutoData.push(obj.bruto);
                 nettoData.push(obj.netto);

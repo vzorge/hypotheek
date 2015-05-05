@@ -1,5 +1,6 @@
 package nl.linuse.hypotheek
 
+import nl.linuse.hypotheek.Main._
 import org.joda.time.DateTime
 import scala.collection.JavaConverters._
 
@@ -18,11 +19,11 @@ class HypotheekBerekening(viewModel: ViewModel) {
   }
 
   private def getAflosVorm(v: HypotheekPropertiesModel): Aflosvorm = {
-    if (v.aflosvorm == "Annuiteit") {
-      new Annuiteit(createHypotheekProperties(v))
-    }
-    else {
-      new Lineair(createHypotheekProperties(v))
+    val properties: AflosvormParameters = createHypotheekProperties(v)
+    v.aflosvorm match {
+      case "Annuiteit" => new Annuiteit(properties)
+      case "Lineair" => new Lineair(properties)
+      case _ => new Aflossingsvrij(properties)
     }
   }
 
@@ -30,5 +31,7 @@ class HypotheekBerekening(viewModel: ViewModel) {
     new AflosvormParameters(v.getHypotheekSom, v.getRente / 100.0, v.getLooptijdMaanden, wozWaarde * forfaitPercentage, belastingSchijf / 100.0, monthOfYear, year)
   }
 
-  private def combineLasten(acc: Lasten, last: Lasten): Lasten = new Lasten(last.year, last.bruto + acc.bruto, last.netto + acc.netto)
+  private def combineLasten(acc: Lasten, last: Lasten): Lasten = new Lasten(last.year, round(last.bruto + acc.bruto), round(last.netto + acc.netto))
+
+  private def round(bedrag: Bedrag): Bedrag = BigDecimal(bedrag).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
 }

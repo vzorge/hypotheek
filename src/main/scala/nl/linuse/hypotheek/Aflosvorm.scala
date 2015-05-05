@@ -1,6 +1,7 @@
 package nl.linuse.hypotheek
 
 import nl.linuse.hypotheek.Main.Bedrag
+import org.joda.time.{ReadableDuration, DateTime}
 
 abstract class Aflosvorm(parameters: AflosvormParameters) {
   val hoofdSom: Bedrag = parameters.hoofdSom
@@ -10,12 +11,12 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
   val startMonth: Int = parameters.startMonth
   val startYear: Int = parameters.startYear
   val maandRente: Bedrag = Math.pow(1.0 + parameters.jaarRente, 1.0 / 12.0) - 1.0
-
+  val endDate: DateTime = new DateTime().withMonthOfYear(startMonth).withYear(startYear).plusMonths(looptijdMaanden)
   def calculateAflosBedrag(renteBedrag: Bedrag): Bedrag
 
   def renteAflos(): Seq[MaandLasten] = {
     def renteAflosSub(month: Int, year: Int, bedrag: Bedrag, acc: Seq[MaandLasten]): Seq[MaandLasten] = {
-      if (bedrag <= 0.01) {
+      if (bedrag <= 0.01 || (endDate.getYear == year && endDate.getMonthOfYear == month)) {
         acc
       } else {
         val renteBedrag = maandRente * bedrag
@@ -50,9 +51,9 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
       new JaarLasten(nrMonths + 1, totalRente + maandLast.rente, totalAflos + maandLast.aflos)
     }
 
-    def brutoBedrag(): Bedrag = round((totalAflos + totalRente) / nrMonths)
+    def brutoBedrag(): Bedrag = (totalAflos + totalRente) / nrMonths
 
-    def nettoBedrag(): Bedrag = round((totalAflos + (totalRente - terugvanBelasting)) / nrMonths)
+    def nettoBedrag(): Bedrag = (totalAflos + (totalRente - terugvanBelasting)) / nrMonths
 
     private def terugvanBelasting: Bedrag = {
       val b: Bedrag = (totalRente - calcForfaitBedrag()) * belastingSchaal
@@ -61,9 +62,6 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
 
     private def calcForfaitBedrag(): Bedrag = if (nrMonths == 12) forfaitBedrag else forfaitBedrag * (nrMonths / 12.0)
 
-    def round(bedrag: Bedrag): Bedrag = {
-      BigDecimal(bedrag).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-    }
   }
 
 }

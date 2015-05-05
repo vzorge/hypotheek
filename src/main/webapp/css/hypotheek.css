@@ -8,3 +8,8 @@
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+
+.lasten-chart {
+    width: 100%;
+    height: 750px;
+}
