@@ -13,11 +13,11 @@
     <script src="HypotheekController.js"></script>
 </head>
 <body data-ng-controller="HypotheekController as ctrl" style="margin: 10px;">
-<h2>Overzicht van bruto en netto maandbedrag voor een hypotheek</h2>
+<h2 class="text-center">Overzicht van bruto en netto maandbedrag voor een hypotheek</h2>
 <div class="container-fluid">
     <form data-ng-submit="ctrl.redraw()">
     <div>
-        <div class="row">
+        <div class="row row-centered">
             <div class="col-md-3">
                 <p>
                     <button type=submit class="btn btn-primary btn-lg">Ververs</button>
@@ -52,7 +52,7 @@
             <div class="col-md-3"></div>
         </div>
         <div class="row">
-            <div class="col-md-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
+            <div class="col-sm-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
                 <div class="leningdeel">
                     <div class="form-group">
                         <label for="aflosvorm-{{$index}}">Soort hypotheek / Aflosvorm</label>
