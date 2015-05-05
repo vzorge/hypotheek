@@ -49,16 +49,23 @@
         <div class="col-md-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
             <div class="leningdeel">
                 <div class="form-group">
+                    <label for="aflosvorm-{{$index}}">Soort hypotheek / Aflosvorm</label>
+                    <select id="aflosvorm-{{$index}}" class="form-control" data-ng-model="hypotheek.aflosvorm">
+                        <option>Annuiteit</option>
+                        <option>Lineair</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="hypotheekSom-{{$index}}">Hypotheeksom</label>
                     <div class="input-group">
                         <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                        <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size"/>
+                        <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size" step="1000"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="rente-{{$index}}">Rente</label>
                     <div class="input-group">
-                        <input id="rente-{{$index}}" type="number" data-ng-model="hypotheek.rente" class="form-control input-size"/>
+                        <input id="rente-{{$index}}" type="number" data-ng-model="hypotheek.rente" class="form-control input-size" step="0.1"/>
                         <span class="input-group-addon">%</span>
                     </div>
                 </div>

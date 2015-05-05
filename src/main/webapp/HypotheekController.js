@@ -8,7 +8,8 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
             {
                 hypotheekSom: 260000,
                 rente: 2.9,
-                looptijdMaanden: 360
+                looptijdMaanden: 360,
+                aflosvorm: 'Annuiteit'
             }
         ]
     };
@@ -19,7 +20,8 @@ angular.module('hypotheekApp', []).controller('HypotheekController', ['$http', '
         self.model.hypotheken.push({
             hypotheekSom: 0,
             rente: 2.9,
-            looptijdMaanden: 360
+            looptijdMaanden: 360,
+            aflosvorm: 'Annuiteit'
         })
     };
 
