@@ -52,6 +52,11 @@
             <div class="col-md-3"></div>
         </div>
         <div class="row">
+            <div class="row row-centered">
+                <h4 class="text-center total-sum">Totale hypotheeksom: &euro;{{ctrl.model.hypotheken|sumByKey:'hypotheekSom'}}</h4>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-sm-3" data-ng-repeat="hypotheek in ctrl.model.hypotheken">
                 <div class="leningdeel">
                     <div class="form-group">
