@@ -6,4 +6,5 @@ import scala.beans.BeanProperty
 
 class Lasten(@BeanProperty var year : Int,
              @BeanProperty var bruto : Bedrag,
-             @BeanProperty var netto : Bedrag)
+             @BeanProperty var netto : Bedrag,
+             @BeanProperty var restantHoofdSom : Bedrag)

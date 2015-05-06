@@ -21,9 +21,10 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
       } else {
         val renteBedrag = maandRente * bedrag
         val aflosBedrag: Bedrag = calculateAflosBedrag(renteBedrag)
-        val maandLasten: MaandLasten = new MaandLasten(month, year, renteBedrag, aflosBedrag)
+        val restantHoofdSom: Bedrag = bedrag - aflosBedrag
+        val maandLasten: MaandLasten = new MaandLasten(month, year, renteBedrag, aflosBedrag, restantHoofdSom)
         val newDate = calcNewDate(month, year)
-        renteAflosSub(newDate._1, newDate._2, bedrag - aflosBedrag, acc :+ maandLasten)
+        renteAflosSub(newDate._1, newDate._2, restantHoofdSom, acc :+ maandLasten)
       }
     }
     renteAflosSub(startMonth, startYear, hoofdSom, List())
@@ -34,8 +35,8 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
   }
 
   def nettoList(brutoList: Seq[MaandLasten]): Seq[Lasten] = {
-    val values: Map[Int, JaarLasten] = brutoList.groupBy(_.year).mapValues(seq => seq.foldLeft(new JaarLasten(0, 0, 0))((jaarLast, maand) => jaarLast.addMaand(maand)))
-    values.toList.map(tuple => new Lasten(tuple._1, tuple._2.brutoBedrag(), tuple._2.nettoBedrag())).sortBy(_.year)
+    val values: Map[Int, JaarLasten] = brutoList.groupBy(_.year).mapValues(seq => seq.foldLeft(new JaarLasten(0, 0, 0, hoofdSom))((jaarLast, maand) => jaarLast.addMaand(maand)))
+    values.toList.map(tuple => new Lasten(tuple._1, tuple._2.brutoBedrag(), tuple._2.nettoBedrag(), tuple._2.restantHoofdSom)).sortBy(_.year)
   }
 
 
@@ -43,12 +44,12 @@ abstract class Aflosvorm(parameters: AflosvormParameters) {
     nettoList(renteAflos())
   }
 
-  class MaandLasten(val month: Int, val year: Int, val rente: Bedrag, val aflos: Bedrag)
+  class MaandLasten(val month: Int, val year: Int, val rente: Bedrag, val aflos: Bedrag, val restantHoofdSom: Bedrag)
 
-  class JaarLasten(nrMonths: Int, totalRente: Bedrag, totalAflos: Bedrag) {
+  class JaarLasten(nrMonths: Int, totalRente: Bedrag, totalAflos: Bedrag, val restantHoofdSom: Bedrag) {
 
     def addMaand(maandLast: MaandLasten) = {
-      new JaarLasten(nrMonths + 1, totalRente + maandLast.rente, totalAflos + maandLast.aflos)
+      new JaarLasten(nrMonths + 1, totalRente + maandLast.rente, totalAflos + maandLast.aflos, math.min(restantHoofdSom, maandLast.restantHoofdSom))
     }
 
     def brutoBedrag(): Bedrag = (totalAflos + totalRente) / nrMonths
