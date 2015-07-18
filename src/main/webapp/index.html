@@ -29,13 +29,13 @@
                     <label for="wozWaarde">WOZ waarde</label>
                     <div class="input-group">
                         <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                        <input id="wozWaarde" type="number" data-ng-model="ctrl.model.wozWaarde" class="form-control" step="100"/>
+                        <input id="wozWaarde" type="number" data-ng-model="ctrl.model.wozWaarde" class="form-control" step="1"/>
                     </div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    <label for="belastingSchijf">Hypotheekrente aftrek percentage</label>
+                    <label for="belastingSchijf">aftrek percentage</label>
                     <select id="belastingSchijf" class="form-control" data-ng-model="ctrl.model.belastingSchijf">
                         <option value="36.25">36,25%</option>
                         <option value="42">42%</option>
@@ -71,7 +71,7 @@
                         <label for="hypotheekSom-{{$index}}">Hypotheeksom</label>
                         <div class="input-group">
                             <span class="input-group-addon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                            <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size" step="100"/>
+                            <input id="hypotheekSom-{{$index}}" type="number" data-ng-model="hypotheek.hypotheekSom" class="form-control input-size" step="1"/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -94,10 +94,10 @@
     </div>
     </form>
     <div class="row">
-        <div class="col-lg-9">
+        <div class="col-lg-7">
             <canvas id="chart" class="lasten-chart"></canvas>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-5">
             <table class="table table-hover table-condensed table-responsive">
                 <thead>
                     <tr>

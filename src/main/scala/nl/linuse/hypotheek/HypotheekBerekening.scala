@@ -13,9 +13,12 @@ class HypotheekBerekening(viewModel: ViewModel) {
   val year = new DateTime(viewModel.startDate).getYear
 
   def calculate(): java.util.List[Lasten] = {
-    val values: Map[Int, Lasten] = hypotheken.flatMap(v => getAflosVorm(v).calculateLasten()).groupBy(_.year)
-      .mapValues(_.foldLeft(new Lasten(0, 0, 0, 0))((acc: Lasten, last: Lasten) => combineLasten(acc, last)))
-    values.toList.map(_._2).sortBy(_.year).asJava
+    val jaarLastenPerDeel: Seq[JaarLasten] = hypotheken.flatMap(v => getAflosVorm(v).calculateLasten())
+    val values: Seq[JaarLasten] = jaarLastenPerDeel
+        .groupBy(_.year)
+        .mapValues(_.foldLeft(new JaarLasten(0, 0, 0, 0, 0))((acc: JaarLasten, last: JaarLasten) => acc.combine(last)))
+        .toList.map(_._2)
+    values.map(l => toLasten(l)).sortBy(_.year).asJava
   }
 
   private def getAflosVorm(v: HypotheekPropertiesModel): Aflosvorm = {
@@ -28,10 +31,16 @@ class HypotheekBerekening(viewModel: ViewModel) {
   }
 
   private def createHypotheekProperties(v: HypotheekPropertiesModel): AflosvormParameters = {
-    new AflosvormParameters(v.getHypotheekSom, v.getRente / 100.0, v.getLooptijdMaanden, wozWaarde * forfaitPercentage, belastingSchijf / 100.0, monthOfYear, year)
+    new AflosvormParameters(v.getHypotheekSom, v.getRente / 100.0, v.getLooptijdMaanden, monthOfYear, year)
   }
 
-  private def combineLasten(acc: Lasten, last: Lasten): Lasten = new Lasten(last.year, round(last.bruto + acc.bruto), round(last.netto + acc.netto), round(last.restantHoofdSom + acc.restantHoofdSom))
+  private def toLasten(last: JaarLasten): Lasten = new Lasten(last.year, round(last.brutoMaandBedrag()),
+        round(last.nettoBedrag(belastingSchijf / 100.0, wozWaarde * forfaitPercentage)), round(last.restantHoofdSom))
 
   private def round(bedrag: Bedrag): Bedrag = BigDecimal(bedrag).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+
+
+
+
+
 }
